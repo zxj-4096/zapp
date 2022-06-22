@@ -14,7 +14,7 @@
     <name>zapp</name>
     <description>Demo project for Spring Boot</description>
     <properties>
-        <java.version>18</java.version>
+        <java.version>1.8</java.version>
         <mybatis-plus.version>3.3.2</mybatis-plus.version>
         <fastjson.version>1.2.70</fastjson.version>
     </properties>
