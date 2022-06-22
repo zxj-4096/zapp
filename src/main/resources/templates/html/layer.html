@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" th:href="@{/css/ol.css}" type="text/css">
+    <style>
+        .map {
+            height: 800px;
+            width: 100%;
+        }
+    </style>
+    <script th:src="@{/js/ol.js}"></script>
+    <title>OpenLayers example</title>
+</head>
+<body>
+<div id="map" class="map"></div>
+<script th:inline="javascript">
+    //根据时间变化点的颜色 ，时间越新，颜色越深
+    //最新的一个位置使用tooltip标注出来
+    var data = [[${data}]];
+    var layer = new ol.layer.Vector({
+        source: new ol.source.Vector()
+    })
+    var map = new ol.Map({
+        target: 'map',
+        layers: [
+            new ol.layer.Tile({
+                source: new ol.source.OSM()
+            }),
+            layer
+        ],
+        view: new ol.View({
+            center: [112.56,37.79],
+            projection: 'EPSG:4326',
+            zoom: 13
+        })
+    });
+
+
+
+    function converArgbToRgb(argb) {
+        var rgb = [];
+        rgb[0] = (argb & 0xff0000) >> 16;
+        rgb[1] = (argb & 0xff00) >> 8;
+        rgb[2] = (argb & 0xff);
+        return "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")";
+    }
+
+
+    data.forEach(element=>drawPoint(element));
+    function drawPoint(p) {
+        console.log(p);
+        var shape = new ol.Feature({
+            geometry: new ol.geom.Point([p.lon,p.lat]),
+        });
+        var canvas =document.createElement('canvas');
+        canvas.width = 6;
+        canvas.height = 6;
+        var ctx = canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.arc(3,3,3,0,Math.PI*2);
+        var time = Date.parse(p.updateTime)/1000/255;
+        ctx.fillStyle=converArgbToRgb(time);
+        ctx.closePath();
+        ctx.fill();
+
+        var style = new ol.style.Style({
+            image: new ol.style.Icon({
+                img: canvas,
+                imgSize: [canvas.width, canvas.height],
+                rotation: 90 * Math.PI / 180
+            })
+        });
+        shape.setStyle(style);
+        layer.getSource().addFeature(shape);
+    }
+    // 监听地图点击事件
+    map.on('singleclick', function(evt) {
+        // 获取当前点击坐标，并设置到HTML元素上去
+        var coordinate = evt.coordinate;
+        var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
+            coordinate, 'EPSG:3857', 'EPSG:4326'));
+
+        content.innerHTML = '<p>You clicked here:</p><code>' + hdms +
+            '</code>';
+        // 设置overlay的位置，从而显示在鼠标点击处
+        overlay.setPosition(coordinate);
+    });
+</script>
+</body>
+</html>

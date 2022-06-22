@@ -1,0 +1,25 @@
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<body>
+<canvas id="canvas" width="800" height="800">
+</canvas>
+</body>
+<script th:inline="javascript">
+    var data = [[${data}]];
+    console.log(data);
+    data.forEach(element => drawPoint(element))
+    function getCTX() {
+        let c = document.getElementById("canvas");
+        let ctx = c.getContext("2d");
+        // ctx.clearRect(0,0,c.width,c.height);
+        return ctx;
+    }
+    function drawPoint(point) {
+        // 获取画笔
+        let ctx = getCTX();
+        // 设置绘制颜色
+        ctx.fillStyle = "#000000";
+        // 绘制成矩形
+        ctx.fillRect(point.lat*1000000- - 2, point.lon - 2, 4, 4);
+    }
+</script>
+</html>
