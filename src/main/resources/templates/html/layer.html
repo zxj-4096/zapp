@@ -59,7 +59,7 @@
         var ctx = canvas.getContext("2d");
         ctx.beginPath();
         ctx.arc(3,3,3,0,Math.PI*2);
-        var time = Date.parse(p.updateTime)/1000/255;
+        var time = Date.parse(p.updateTime)/1000%255;
         ctx.fillStyle=converArgbToRgb(time);
         ctx.closePath();
         ctx.fill();
